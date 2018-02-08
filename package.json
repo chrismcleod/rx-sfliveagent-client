@@ -1,0 +1,29 @@
+{
+  "name": "rx-sfliveagent-client",
+  "private": false,
+  "version": "1.0.0",
+  "description": "A client library for the Salesforce LiveAgent API that uses RxJS 5 streams",
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
+  "repository": "https://github.com/chrismcleod/rx-sfliveagent-client",
+  "author": "Chris McLeod <chris@warebots.com>",
+  "license": "MIT",
+  "scripts": {
+    "example": "nodemon -r dotenv/config ./lib/example.js"
+  },
+  "dependencies": {
+    "axios": "^0.17.1",
+    "lodash": "^4.17.4",
+    "rxjs": "6.0.0"
+  },
+  "devDependencies": {
+    "@types/axios": "^0.14.0",
+    "@types/lodash": "^4.14.86",
+    "@types/node": "^8.0.53",
+    "dotenv": "^5.0.1",
+    "tslint": "^5.9.1",
+    "tslint-config-airbnb": "^5.8.0",
+    "tslint-eslint-rules": "^5.1.0",
+    "typescript": "^2.8.3"
+  }
+}
