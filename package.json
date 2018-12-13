@@ -1,7 +1,7 @@
 {
   "name": "rx-sfliveagent-client",
   "private": false,
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A client library for the Salesforce LiveAgent API that uses RxJS 5 streams",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
