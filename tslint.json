@@ -1,43 +1,104 @@
 {
   "extends": [
-    "tslint-config-airbnb",
-    "tslint-eslint-rules"
+    "tslint:latest",
+    "tslint-config-airbnb"
   ],
   "rules": {
-    "align": false,
-    "array-bracket-spacing": true,
-    "object-curly-spacing": true,
+    "align": [
+      true,
+      "members",
+      "parameters",
+      "statements"
+    ],
+    "array-bracket-spacing": [
+      true,
+      "always"
+    ],
+    "array-type": [
+      true,
+      "array-simple"
+    ],
+    "import-name": false,
+    "interface-name": false,
+    "jsx-curly-spacing": [
+      true,
+      "always"
+    ],
+    "jsx-no-lambda": false,
+    "jsx-no-multiline-js": false,
+    "max-line-length": false,
+    "no-boolean-literal-compare": false,
+    "no-console": false,
+    "no-empty-interface": false,
+    "no-implicit-dependencies": false,
+    "no-namespace": false,
+    "no-parameter-reassignment": false,
+    "no-shadowed-variable": false,
+    "no-submodule-imports": [
+      true,
+      "components",
+      "rxjs",
+      "react-native-vector-icons"
+    ],
+    "object-curly-spacing": [
+      true,
+      "always"
+    ],
+    "object-literal-sort-keys": false,
     "ordered-imports": [
       true,
       {
+        "grouped-imports": true,
         "import-sources-order": "lowercase-last",
-        "named-imports-order": "lowercase-last",
-        "grouped-imports": true
+        "named-imports-order": "lowercase-last"
       }
     ],
-    "whitespace": {
-      "options": [
-        "check-branch",
-        "check-decl",
-        "check-module",
-        "check-operator",
-        "check-preblock",
-        "check-rest-spread",
-        "check-separator",
-        "check-type",
-        "check-type-operator",
-        "check-typecast"
-      ]
-    },
-    "max-line-length": {
-      "options": [
-        1000
-      ]
-    },
-    "variable-name": {
-      "options": [
-        "allow-leading-underscore"
-      ]
-    }
+    "prefer-array-literal": false,
+    "prefer-conditional-expression": false,
+    "quotemark": [
+      true,
+      "single"
+    ],
+    "semicolon": [
+      true,
+      "always"
+    ],
+    "ter-arrow-parens": [
+      true,
+      "always"
+    ],
+    "ter-computed-property-spacing": false,
+    "ter-indent": false,
+    "typedef-whitespace": [
+      true,
+      {
+        "call-signature": "nospace",
+        "index-signature": "nospace",
+        "parameter": "nospace",
+        "property-declaration": "nospace",
+        "variable-declaration": "nospace"
+      },
+      {
+        "call-signature": "onespace",
+        "index-signature": "onespace",
+        "parameter": "onespace",
+        "property-declaration": "onespace",
+        "variable-declaration": "onespace"
+      }
+    ],
+    "variable-name": false,
+    "whitespace": [
+      true,
+      "check-branch",
+      "check-decl",
+      "check-operator",
+      "check-module",
+      "check-separator",
+      "check-rest-spread",
+      "check-type",
+      "check-typecast",
+      "check-type-operator",
+      "check-preblock"
+    ]
   }
 }

@@ -1,4 +1,4 @@
-import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, CancelToken, CancelTokenSource } from 'axios';
+import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, CancelTokenSource } from 'axios';
 import { PromiseQueue, createQueue } from 'rx-promise-queue';
 
 import { Header, Messages, Requests, Responses } from './types';
@@ -41,9 +41,8 @@ export class Api {
 
   public visitor: Visitor;
   private config: LiveagentConfig;
-  private sequence = 1;
   private ack = -1;
-  private session = {} as Responses.SessionId;
+  private session: Responses.SessionId = {} as any;
   private client: AxiosInstance;
   private queue: PromiseQueue = createQueue();
   private clientCancelToken: CancelTokenSource = axios.CancelToken.source();
@@ -54,7 +53,7 @@ export class Api {
     this.client = axios.create({
       baseURL: this.config.host,
       headers: {
-        [ Header.X_LIVEAGENT_API_VERSION ]: this.config.version || '42',
+        [Header.X_LIVEAGENT_API_VERSION]: this.config.version || '42',
         Accept: 'content/json',
         'Content-Type': 'application/json',
       },
@@ -62,8 +61,8 @@ export class Api {
   }
 
   /** Indicates whether a chat button is available to receive new chat requests. */
-  availability = async (data?: Requests.Availability) => {
-    const result = await this.makeRequest<{messages: {message: Responses.Availability}[]}>({
+  public availability = async (data?: Requests.Availability): Promise<Messages.Availability> => {
+    const result = await this.makeRequest<{ messages: Array<{ message: Responses.Availability }> }>({
       url: '/chat/rest/Visitor/Availability',
       method: 'get',
       params: {
@@ -77,25 +76,25 @@ export class Api {
       message: {
         results: result.messages[0].message.results,
       },
-    } as Messages.Availability;
+    };
   }
 
   /** Sets a breadcrumb value to the URL of the Web page that the chat visitor is viewing as the visitor chats with an agent. The agent can then see the value of the breadcrumb to determine the page the chat visitor is viewing. */
-  breadcrumb = async (data: Requests.Breadcrumb) => this.makeRequest<Responses.None>({
+  public breadcrumb = async (data: Requests.Breadcrumb) => this.makeRequest<Responses.None>({
     data,
     url: '/chat/rest/Visitor/Breadcrumb',
     method: 'post',
   })
 
   /** Establishes a new Live Agent session. The SessionId request is required as the first request to create every new Live Agent session. */
-  sessionId = async () => {
+  public sessionId = async () => {
     this.session = await this.makeRequest<Responses.SessionId>({
       url: '/chat/rest/System/SessionId',
     });
   }
 
   /** Initiates a new chat visitor session. The ChasitorInit request is always required as the first POST request in a new chat session. */
-  chasitorInit = async (data: Requests.ChasitorInit) => this.makeSessionRequest<Responses.None>({
+  public chasitorInit = async (data: Requests.ChasitorInit) => this.makeSessionRequest<Responses.None>({
     url: '/chat/rest/Chasitor/ChasitorInit',
     method: 'post',
     data: {
@@ -116,19 +115,19 @@ export class Api {
    *
    * The first response will be a ChasitorSessionData message containing the data from the previous session that will be restored once the session is reestablished. After receiving that message, you can proceed to send the existing messages that were cancelled upon receiving the 503 response status code.
    */
-  resyncSession = async () => this.makeSessionRequest<Responses.ResyncSession>({
+  public resyncSession = async () => this.makeSessionRequest<Responses.ResyncSession>({
     url: '/chat/rest/Chasitor/ChasitorInit',
   })
 
   /** Reestablishes the chat visitor’s state, including the details of the chat, after a ResyncSession request is completed. */
-  chasitorResyncState = async (data: Requests.ChasitorResyncState) => this.makeSessionRequest<Responses.ResyncSession>({
+  public chasitorResyncState = async (data: Requests.ChasitorResyncState) => this.makeSessionRequest<Responses.ResyncSession>({
     data,
     url: '/chat/rest/Chasitor/ChasitorResyncState',
     method: 'post',
   })
 
   /** Indicates that the chat visitor is not typing in the chat window. */
-  chasitorNotTyping = async () => this.makeSessionRequest<Responses.None>({
+  public chasitorNotTyping = async () => this.makeSessionRequest<Responses.None>({
     data: {},
     url: '/chat/rest/Chasitor/ChasitorNotTyping',
     method: 'post',
@@ -136,7 +135,7 @@ export class Api {
   })
 
   /** Provides a chat visitor’s message that was viewable through Sneak Peek. */
-  chasitorSneakPeek = async (data: Requests.ChasitorSneakPeak) => this.makeSessionRequest<Responses.None>({
+  public chasitorSneakPeek = async (data: Requests.ChasitorSneakPeak) => this.makeSessionRequest<Responses.None>({
     data,
     url: '/chat/rest/Chasitor/ChasitorSneakPeek',
     method: 'post',
@@ -144,7 +143,7 @@ export class Api {
   })
 
   /** Indicates that a chat visitor is typing a message in the chat window. */
-  chasitorTyping = async () => this.makeSessionRequest<Responses.None>({
+  public chasitorTyping = async () => this.makeSessionRequest<Responses.None>({
     data: {},
     url: '/chat/rest/Chasitor/ChasitorTyping',
     method: 'post',
@@ -152,7 +151,7 @@ export class Api {
   })
 
   /** Indicates that a chat visitor has ended the chat. */
-  chatEnd = async () => {
+  public chatEnd = async (): Promise<Messages.ChatEnd> => {
     await this.makeSessionRequest<Responses.ChatEnd>({
       data: {
         reason: 'client',
@@ -165,11 +164,11 @@ export class Api {
     return {
       type: 'ChatEnd',
       message: {},
-    } as Messages.ChatEnd;
+    };
   }
 
   /** Returns the body of the chat message sent by the chat visitor. */
-  chatMessage = async (data: Requests.ChatMessage) => {
+  public chatMessage = async (data: Requests.ChatMessage): Promise<Messages.ChasitorChatMessage> => {
     await this.makeSessionRequest<Responses.None>({
       data,
       url: '/chat/rest/Chasitor/ChatMessage',
@@ -183,11 +182,11 @@ export class Api {
         name: this.visitor.name,
         agentId: this.visitor.id,
       },
-    } as Messages.ChasitorChatMessage;
+    };
   }
 
   /** Indicates a custom event was sent from the chat visitor during the chat. */
-  customEvent = async (data: Requests.CustomEvent) => this.makeSessionRequest<Responses.None>({
+  public customEvent = async (data: Requests.CustomEvent) => this.makeSessionRequest<Responses.None>({
     data,
     url: '/chat/rest/Chasitor/CustomEvent',
     method: 'post',
@@ -195,7 +194,7 @@ export class Api {
   })
 
   /** Returns all messages that were sent between agents and chat visitors during a chat session. */
-  messages = async () => {
+  public messages = async () => {
     const response = await this.makeSessionRequest<Responses.Messages | void>({
       url: '/chat/rest/System/Messages',
       method: 'get',
@@ -208,7 +207,7 @@ export class Api {
   }
 
   /** Batches multiple POST requests together if you’re sending multiple messages at the same time. */
-  multiNoun = async (data: Requests.MultiNoun) => this.makeSessionRequest<Responses.None>({
+  public multiNoun = async (data: Requests.MultiNoun) => this.makeSessionRequest<Responses.None>({
     data,
     url: '/chat/rest/System/MultiNoun',
     method: 'post',
@@ -216,7 +215,7 @@ export class Api {
   })
 
   /** Retrieves all settings information about the Live Agent deployment that’s associated with your chat session. The Settings request is required as the first request to establish a chat visitor’s session. */
-  settings = async (data: Requests.Settings) => this.makeRequest<Responses.Settings>({
+  public settings = async (data: Requests.Settings) => this.makeRequest<Responses.Settings>({
     url: '/chat/rest/Visitor/Settings',
     method: 'get',
     params: {
@@ -228,7 +227,7 @@ export class Api {
   })
 
   /** Generates a unique ID to track a chat visitor when they initiate a chat request and tracks the visitor’s activities as the visitor navigates from one Web page to another. */
-  visitorId = async () => this.makeRequest<Responses.VisitorId>({
+  public visitorId = async () => this.makeRequest<Responses.VisitorId>({
     url: '/chat/rest/Visitor/VisitorId',
     method: 'get',
     params: {
@@ -243,17 +242,16 @@ export class Api {
     if (config.useQueue === undefined) config.useQueue = true;
     if (config && config.data && config.data.visitorName) this.visitor.name = config.data.visitorName;
     config.headers = config.headers || {};
-    config.headers[ Header.X_LIVEAGENT_AFFINITY ] = config.affinityToken || 'null';
-    if (config.key) config.headers[ Header.X_LIVEAGENT_SESSION_KEY ] = config.key;
-    // if (config.sequence === true) config.headers[ Header.X_LIVEAGENT_SEQUENCE ] = this.sequence;
+    config.headers[Header.X_LIVEAGENT_AFFINITY] = config.affinityToken || 'null';
+    if (config.key) config.headers[Header.X_LIVEAGENT_SESSION_KEY] = config.key;
 
     try {
       const response = config.useQueue ? (
         await this.queue.add(() => this.client.request<Responses.Any>(config))
       ) : (
-        await this.client.request<Responses.Any>(config)
-      );
-      // if (response && response.data && response.data.sequence !== undefined && config.sequence) this.sequence = (response.data as any).sequence;
+          await this.client.request<Responses.Any>(config)
+        );
+
       return response.data as T;
     } catch (error) {
       if (isAxiosError(error) && error.response) {
@@ -291,7 +289,6 @@ export class Api {
     if (!this.session || !this.session.id || !this.session.key) throw new Error('Session is invalid.  You must start a session before calling this method.  This usually happens if you have tried to use an API method before calling the sessionId method.');
     try {
       const result = await this.makeRequest<T>({ ...config, ...this.session });
-      if (config.sequence) this.sequence += 1;
       return result;
     } catch (error) {
       throw error;

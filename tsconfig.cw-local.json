@@ -1,0 +1,6 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../exp/campingworld/node_modules/rx-sfliveagent-client/lib"
+  }
+}
