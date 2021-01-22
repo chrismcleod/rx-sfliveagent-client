@@ -12,7 +12,7 @@
     "example": "nodemon -r dotenv/config ./lib/example.js"
   },
   "dependencies": {
-    "axios": "^0.18.1",
+    "axios": "^0.21.1",
     "lodash": "^4.17.4",
     "rx-promise-queue": "^0.0.1",
     "rxjs": "6.0.0"
